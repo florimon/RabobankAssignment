@@ -9,6 +9,21 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>rabobank-assignment-api</artifactId>
 
+    <properties>
+        <swagger-annotations.version>2.1.10</swagger-annotations.version>
+        <swagger-codegen.version>3.0.27</swagger-codegen.version>
+        <validation-api.version>2.0.1.Final</validation-api.version>
+        <guava.version>27.1-jre</guava.version>
+        <build-helper.version>3.2.0</build-helper.version>
+        <mockito.version>2.23.0</mockito.version>
+        <maven-surefire.version>2.22.2</maven-surefire.version>
+
+        <codegen.yaml>${project.basedir}/src/main/resources/powerOfAttorney.yaml</codegen.yaml>
+        <codegen.output>target/generated-sources</codegen.output>
+        <codegen.model-package>nl.rabobank.generated.model</codegen.model-package>
+        <codegen.api-package>nl.rabobank.generated.api</codegen.api-package>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -24,8 +39,107 @@
             <artifactId>rabobank-assignment-domain</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <!-- Add your dependencies here! -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger-annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>${validation-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.swagger.codegen.v3</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>${swagger-codegen.version}</version>
+                <executions>
+                    <execution>
+                        <id>swagger-generate-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <language>spring</language>
+                            <library>spring-mvc</library>
+                            <addCompileSourceRoot>true</addCompileSourceRoot>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <inputSpec>${codegen.yaml}</inputSpec>
+                            <output>${codegen.output}</output>
+                            <modelPackage>${codegen.model-package}</modelPackage>
+                            <apiPackage>${codegen.api-package}</apiPackage>
+                            <configOptions>
+                                <sourceFolder>src/main/java</sourceFolder>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                            </configOptions>
+                            <additionalProperties>
+                                <additionalProperty>useBeanValidation=true</additionalProperty>
+                                <additionalProperty>jackson=true</additionalProperty>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

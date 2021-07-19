@@ -1,0 +1,16 @@
+[
+  {
+    "_class": "nl.rabobank.mongo.model.AccountDocument",
+    "number": "RABO 001",
+    "holder" : "testHolder",
+    "balance" : 123.45,
+    "accountType" : "PAYMENT"
+  },
+  {
+    "_class": "nl.rabobank.mongo.model.AccountDocument",
+    "number": "RABO 001",
+    "holder" : "testHolder",
+    "balance" : 234.56,
+    "accountType" : "SAVINGS"
+  }
+]

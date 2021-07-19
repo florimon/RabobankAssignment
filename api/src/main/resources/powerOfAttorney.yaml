@@ -1,0 +1,150 @@
+openapi: "3.0.0"
+info:
+  description: Power Of Attorney OpenApi model for Rabobank assignment project
+  version: "0.0.1"
+  title: "Power Of Attorney API"
+  contact:
+    name: Florimon van Putte
+    email: florimon@van-putte.nl
+
+servers:
+  - url: 'http://localhost:8080'
+    description: local testing environment
+
+paths:
+  /power-of-attorney:
+    post:
+      description: Create a Power of Attorney.
+      tags:
+        - Power of Attorney
+      operationId: createByGrantor
+      parameters:
+        - $ref: '#/components/parameters/X-UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreationRequest'
+      responses:
+        '200':
+          description: Normal success response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PowerOfAttorneyType'
+        '400':
+          description: >
+            Bad Request Error response, e.g. when trying to create a Power of Attorney for a non-existent
+            Payment or Savings account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: >
+            Unauthenticated Error response, e.g. when trying to create a Power of Attorney without providing
+            the X-UserId request header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      description: Retrieve the list of Power of Attorneys for a specific grantee
+      tags:
+        - Power of Attorney
+      operationId: listForGrantee
+      parameters:
+        - $ref: '#/components/parameters/X-UserId'
+      responses:
+        '200':
+          description: List of Power of Attorneys for grantee
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListResponse'
+        '401':
+          description: >
+            Unauthenticated Error response, e.g. when trying to list Power of Attorneys without providing
+            the X-UserId request header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  parameters:
+    X-UserId:
+      in: header
+      name: X-UserId
+      description: >
+        Id of the user making the request. It is assumed that this userId has been properly authenticated by
+        a frontend application or some gateway.
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    CreationRequest:
+      description: Request to create a Power of Attorney
+      properties:
+        grantee:
+          type: string
+          description: The id of the user that is granted the Power of Attorney.
+        accountNumber:
+          type: string
+          description: The account number that the grantee is granted control over.
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+        authorizationType:
+          $ref: '#/components/schemas/AuthorizationType'
+      required:
+        - grantee
+        - accountNumber
+        - accountType
+        - authorizationType
+
+    ListResponse:
+      description: Normal response to listForGrantee
+      type: object
+      properties:
+        powerOfAttorneys:
+          type: array
+          items:
+            $ref: '#/components/schemas/PowerOfAttorneyType'
+
+    PowerOfAttorneyType:
+      properties:
+        grantee:
+          type: string
+        accountHolder:
+          type: string
+        accountNumber:
+          type: string
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+        authorizationType:
+          $ref: '#/components/schemas/AuthorizationType'
+
+    AccountType:
+      description: The type of an account.
+      type: string
+      enum: [SAVINGS, PAYMENT]
+
+    AuthorizationType:
+      description: The type of control permission that is granted.
+      type: string
+      enum: [READ, WRITE]
+
+    ErrorResponse:
+      description: Error response
+      properties:
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: 'Bad Request'
+        message:
+          type: string
+          example: 'No Power of Attorneys found'
+
